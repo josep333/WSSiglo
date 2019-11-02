@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * @author Asus
  */
 public class Conexion {
-    private static String servidor="jdbc:oracle:thin:@mycm.cl:4921:XE [siglo21 en SIGLO21]"; 
+    private static String servidor="jdbc:oracle:thin:@mycm.cl:4921:XE"; 
     private static String usuario ="siglo21";
     private static String contrasenia="siglo21";
     public static String driver="oracle.jdbc.OracleDriver";
