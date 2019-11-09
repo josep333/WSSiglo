@@ -5,6 +5,7 @@
  */
 package ws;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +25,7 @@ public class NewWebService {
     Conexion cone = new Conexion();
     Connection con = cone.getConnection();
     Statement st;
-    ResultSet rs;
+    ResultSet rs,proce;
 
     /**
      * Web service operation
@@ -50,13 +51,33 @@ public class NewWebService {
      */
     @WebMethod(operationName = "WStransferencia")
     public int WStransferencia(@WebParam(name = "run") String run, @WebParam(name = "pass") String pass, @WebParam(name = "montoPago") int montoPago) {
+        
      String valor = "select t.MONTO from transferencia t where t.RUT='" + run + "' and t.PASS='" + pass + "'";
+     
         try {
             st=con.createStatement();
             rs=st.executeQuery(valor);
+            int res = 0;
+            while(rs.next())
+            {
+                res = rs.getInt(1);
+              //  System.err.println(res);
+            }
+            int monto = res-montoPago;
+//            String procedimiento="call  SP_TRANSFERENCIA ('"+run+"','"+pass+"',"+monto+")";
+//            proce=st.executeQuery(procedimiento);
+//            System.out.println("señor jesucristo"+monto);
             
-            return 1;
+            String query = "{call  SP_TRANSFERENCIA(?,?,?)}"; 
+            CallableStatement statement = con.prepareCall(query);  
+            statement.setString(1, run);
+            statement.setString(2, pass);
+            statement.setInt(3, monto);
+            statement.execute(); 
+            
+            return monto;
         } catch (Exception e) {
+            System.out.println(e.getMessage()+" se mamo");
             return 0;
         }
 
