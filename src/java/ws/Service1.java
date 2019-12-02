@@ -32,6 +32,7 @@ public class Service1 {
      */
     @WebMethod(operationName = "WSSII")
     public int WSSII(@WebParam(name = "id") int id) {
+        
         String sql = "call sp_boleta(?)";
         try {
             CallableStatement statement = con.prepareCall(sql);
@@ -40,6 +41,7 @@ public class Service1 {
             con.close();
             return 1;
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             return 0;
         }
     }
@@ -58,26 +60,28 @@ public class Service1 {
             int res = 0;
             while (rs.next()) {
                 res = rs.getInt(1);
-                //  System.err.println(res);
+                System.err.println(res);
             }
             int monto = res - montoPago;
-//            String procedimiento="call  SP_TRANSFERENCIA ('"+run+"','"+pass+"',"+monto+")";
-//            proce=st.executeQuery(procedimiento);
-//            System.out.println("señor jesucristo"+monto);
+            if (monto >= 0) {
+                String query = "{call  SP_TRANSFERENCIA(?,?,?)}";
+                CallableStatement statement = con.prepareCall(query);
+                statement.setString(1, run);
+                statement.setString(2, pass);
+                statement.setInt(3, monto);
+                statement.execute();
 
-            String query = "{call  SP_TRANSFERENCIA(?,?,?)}";
-            CallableStatement statement = con.prepareCall(query);
-            statement.setString(1, run);
-            statement.setString(2, pass);
-            statement.setInt(3, monto);
-            statement.execute();
+                return monto;
+            } else {
+                return -1;
+            }
 
-            return monto;
         } catch (Exception e) {
             System.out.println(e.getMessage() + " se mamo");
-            return 0;
+            return -1;
         }
 
     }
+
 
 }
